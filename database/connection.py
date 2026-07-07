@@ -1,3 +1,4 @@
+import os
 import psycopg2
 from psycopg2 import pool
 from config import Config
@@ -9,17 +10,27 @@ class DatabaseConnectionPool:
 
     @classmethod
     def initialize(cls):
-        """Initialize the connection pool."""
+        """Initialize the connection pool.
+        
+        Supports both DATABASE_URL (Render/cloud) and individual
+        DB_HOST / DB_PORT / DB_NAME / DB_USER / DB_PASSWORD env vars.
+        """
         if cls._pool is None:
             try:
-                cls._pool = pool.SimpleConnectionPool(
-                    1, 10,
-                    host=Config.DB_HOST,
-                    port=Config.DB_PORT,
-                    database=Config.DB_NAME,
-                    user=Config.DB_USER,
-                    password=Config.DB_PASSWORD
-                )
+                database_url = os.environ.get('DATABASE_URL')
+                if database_url:
+                    # Render provides postgres:// but psycopg2 needs postgresql://
+                    database_url = database_url.replace('postgres://', 'postgresql://', 1)
+                    cls._pool = pool.SimpleConnectionPool(1, 10, dsn=database_url)
+                else:
+                    cls._pool = pool.SimpleConnectionPool(
+                        1, 10,
+                        host=Config.DB_HOST,
+                        port=Config.DB_PORT,
+                        database=Config.DB_NAME,
+                        user=Config.DB_USER,
+                        password=Config.DB_PASSWORD
+                    )
                 app_logger.info("PostgreSQL Connection Pool initialized successfully.")
             except psycopg2.DatabaseError as e:
                 app_logger.error(f"Error initializing PostgreSQL Connection Pool: {e}")
