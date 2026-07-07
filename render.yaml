@@ -33,5 +33,4 @@ services:
                                                                                                                                                                                                                             databases:
                                                                                                                                                                                                                               - name: data-clean-db
                                                                                                                                                                                                                                   databaseName: clean_data
-                                                                                                  
-                                                                                                                                                                                                                                      
+                                                                                                                                                                                                                                      plan: free
