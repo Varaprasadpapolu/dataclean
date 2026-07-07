@@ -1,36 +1,37 @@
 services:
   - type: web
-      name: data-clean
-          runtime: python
-              buildCommand: pip install -r requirements.txt && cd frontend && npm install && npm run build
-                  startCommand: gunicorn app:app --bind 0.0.0.0:$PORT --workers 2 --timeout 120
-                      envVars:
-                            - key: PYTHON_VERSION
-                                    value: 3.11.0
-                                          - key: SECRET_KEY
-                                                  generateValue: true
-                                                        - key: DB_HOST
-                                                                fromDatabase:
-                                                                          name: data-clean-db
-                                                                                    property: host
-                                                                                          - key: DB_PORT
-                                                                                                  fromDatabase:
-                                                                                                            name: data-clean-db
-                                                                                                                      property: port
-                                                                                                                            - key: DB_NAME
-                                                                                                                                    fromDatabase:
-                                                                                                                                              name: data-clean-db
-                                                                                                                                                        property: database
-                                                                                                                                                              - key: DB_USER
-                                                                                                                                                                      fromDatabase:
-                                                                                                                                                                                name: data-clean-db
-                                                                                                                                                                                          property: user
-                                                                                                                                                                                                - key: DB_PASSWORD
-                                                                                                                                                                                                        fromDatabase:
-                                                                                                                                                                                                                  name: data-clean-db
-                                                                                                                                                                                                                            property: password
-                                                                                                                                                                                                                            
-                                                                                                                                                                                                                            databases:
-                                                                                                                                                                                                                              - name: data-clean-db
-                                                                                                                                                                                                                                  databaseName: clean_data
-                                                                                                                                                                                                                                      plan: free
+    name: data-clean
+    runtime: python
+    buildCommand: pip install -r requirements.txt && cd frontend && npm install && npm run build
+    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT --workers 2 --timeout 120
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DB_HOST
+        fromDatabase:
+          name: data-clean-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: data-clean-db
+          property: port
+      - key: DB_NAME
+        fromDatabase:
+          name: data-clean-db
+          property: database
+      - key: DB_USER
+        fromDatabase:
+          name: data-clean-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: data-clean-db
+          property: password
+
+databases:
+  - name: data-clean-db
+    databaseName: clean_data
+    user: postgres
+    plan: free
