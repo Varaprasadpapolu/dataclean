@@ -1,0 +1,38 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg-info/
+*.egg
+dist/
+build/
+
+# Virtual environment
+.venv/
+venv/
+env/
+
+# Logs
+logs/
+*.log
+database/logs/
+
+# Runtime / generated data  (do NOT commit user uploads or cleaned outputs)
+uploads/
+cleaned_files/
+
+# Environment / secrets
+.env
+.env.*
+
+# VS Code
+.vscode/
+
+# Frontend build output (built from source, not needed in repo)
+frontend/dist/
+frontend/node_modules/
+
+# OS
+.DS_Store
+Thumbs.db

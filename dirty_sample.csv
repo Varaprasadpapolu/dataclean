@@ -1,0 +1,8 @@
+ First Name ,email address!,age,Salary,join_date
+ John  ,john@example.com,32,50000.0,2024-01-15
+ Alice ,alice@example.com,28,60000.0,2023/05/20
+ John  ,john@example.com,32,50000.0,2024-01-15
+Bob,bob@example.com,45,,06-12-2022
+ Charlie ,charlie@example.com,150,80000.0,2021.11.02
+,unknown@email.com,40,55000.0,
+ John  ,john@example.com,32,50000.0,2024-01-15

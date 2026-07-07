@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clean Data - Premium Data Cleaning Dashboard</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="dark-theme">
+    
+    <!-- Background Glows -->
+    <div class="glow-bg glow-1"></div>
+    <div class="glow-bg glow-2"></div>
+    
+    <!-- App Container -->
+    <div class="app-layout">
+        
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i data-lucide="sparkles" class="logo-icon animate-pulse"></i>
+                    <span class="logo-text">Clean<span>Data</span></span>
+                </div>
+                <button class="mobile-close-btn" id="mobileCloseBtn">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            
+            <nav class="sidebar-menu">
+                <a href="#overview" class="menu-item active" data-section="overview">
+                    <i data-lucide="layout-dashboard"></i>
+                    <span>Overview</span>
+                </a>
+                <a href="#upload-section" class="menu-item" data-section="upload-section">
+                    <i data-lucide="upload-cloud"></i>
+                    <span>Upload & Clean</span>
+                </a>
+                <a href="#preview-section" class="menu-item disabled" id="navPreviewBtn" data-section="preview-section">
+                    <i data-lucide="table"></i>
+                    <span>Data Preview</span>
+                </a>
+                <a href="#download-section" class="menu-item disabled" id="navDownloadBtn" data-section="download-section">
+                    <i data-lucide="download"></i>
+                    <span>Export & Save</span>
+                </a>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <div class="db-status-container">
+                    <div class="db-status-dot" id="dbStatusDot"></div>
+                    <span class="db-status-text" id="dbStatusText">PostgreSQL: Disconnected</span>
+                </div>
+            </div>
+        </aside>
+        
+        <!-- Main Content Wrapper -->
+        <div class="main-wrapper">
+            
+            <!-- Top Navigation Bar -->
+            <header class="top-nav">
+                <button class="mobile-toggle" id="mobileToggleBtn">
+                    <i data-lucide="menu"></i>
+                </button>
+                
+                <div class="nav-search">
+                    <!-- Dynamic Title based on Active Section -->
+                    <h1 id="pageTitle" class="section-title">Dashboard Overview</h1>
+                </div>
+                
+                <div class="nav-actions">
+                    <button class="theme-toggle-btn" id="themeToggleBtn" title="Toggle Theme">
+                        <i data-lucide="sun" id="themeIconSun"></i>
+                        <i data-lucide="moon" id="themeIconMoon" class="hidden"></i>
+                    </button>
+                    <div class="user-profile">
+                        <span class="avatar">CD</span>
+                        <span class="user-name">Guest User</span>
+                    </div>
+                </div>
+            </header>
+            
+            <!-- Dashboard Main Views -->
+            <main class="main-content" id="mainContent">
+                
+                <!-- SECTION 1: OVERVIEW -->
+                <section id="overviewSection" class="content-section active">
+                    <div class="welcome-card glass-card">
+                        <div class="welcome-text">
+                            <h2>Welcome to Clean Data</h2>
+                            <p>Upload raw CSV or Excel datasets, execute advanced Pandas-powered cleaning rules in one click, preview your results instantly, and export directly back to your local PostgreSQL database.</p>
+                            <button class="btn btn-primary start-cleaning-btn">
+                                <i data-lucide="play"></i> Start Cleaning
+                            </button>
+                        </div>
+                        <div class="welcome-illustration">
+                            <i data-lucide="database" class="ill-icon"></i>
+                        </div>
+                    </div>
+                    
+                    <!-- Overview Metrics -->
+                    <div class="metrics-grid">
+                        <div class="metric-card glass-card">
+                            <div class="metric-icon-box blue-glow">
+                                <i data-lucide="file-text"></i>
+                            </div>
+                            <div class="metric-info">
+                                <h3>Total Uploaded</h3>
+                                <span class="metric-value" id="statTotalUploaded">0</span>
+                                <p class="metric-sub">Files stored in uploads/</p>
+                            </div>
+                        </div>
+                        <div class="metric-card glass-card">
+                            <div class="metric-icon-box purple-glow">
+                                <i data-lucide="check-circle-2"></i>
+                            </div>
+                            <div class="metric-info">
+                                <h3>Total Cleaned</h3>
+                                <span class="metric-value" id="statTotalCleaned">0</span>
+                                <p class="metric-sub">Cleaned datasets ready</p>
+                            </div>
+                        </div>
+                        <div class="metric-card glass-card">
+                            <div class="metric-icon-box green-glow" id="dbStatIconBox">
+                                <i data-lucide="server"></i>
+                            </div>
+                            <div class="metric-info">
+                                <h3>Database Status</h3>
+                                <span class="metric-value" id="statDbConnected">Checking...</span>
+                                <p class="metric-sub" id="statDbSub">PostgreSQL public schema</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Recent Files History -->
+                    <div class="history-table-container glass-card">
+                        <div class="card-header">
+                            <h3 class="card-title"><i data-lucide="history"></i> Recently Processed Datasets</h3>
+                            <button class="btn btn-sm btn-secondary refresh-history-btn" id="refreshHistoryBtn">
+                                <i data-lucide="refresh-cw"></i> Refresh
+                            </button>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="recent-table" id="recentFilesTable">
+                                <thead>
+                                    <tr>
+                                        <th>File Name</th>
+                                        <th>Original Rows</th>
+                                        <th>Cleaned Rows</th>
+                                        <th>Processing Time</th>
+                                        <th>Processed Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="recentFilesBody">
+                                    <tr>
+                                        <td colspan="5" class="loading-placeholder">
+                                            <i data-lucide="loader-2" class="animate-spin"></i> Fetching history...
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- SECTION 2: UPLOAD & CLEAN -->
+                <section id="uploadSection" class="content-section">
+                    
+                    <!-- File Drag & Drop Panel -->
+                    <div class="upload-container glass-card" id="dropzoneContainer">
+                        <div class="drag-drop-area" id="dragDropArea">
+                            <input type="file" id="fileInput" accept=".csv, .xls, .xlsx" class="hidden-file-input">
+                            <i data-lucide="upload-cloud" class="upload-icon"></i>
+                            <h3>Drag & Drop your dataset here</h3>
+                            <p class="upload-sub">Supports CSV, XLS, and XLSX files up to 16MB</p>
+                            <button class="btn btn-secondary browse-btn" id="browseBtn">
+                                <i data-lucide="file-search"></i> Browse Files
+                            </button>
+                        </div>
+                        
+                        <!-- File Upload Info & Progress -->
+                        <div class="upload-progress-card hidden" id="uploadProgressCard">
+                            <div class="file-details">
+                                <i data-lucide="file-spreadsheet" class="file-icon"></i>
+                                <div class="file-info-text">
+                                    <h4 class="filename" id="selectedFilename">filename.csv</h4>
+                                    <span class="filesize" id="selectedFilesize">0 KB</span>
+                                </div>
+                                <button class="btn-icon btn-cancel" id="cancelUploadBtn" title="Cancel upload">
+                                    <i data-lucide="trash-2"></i>
+                                </button>
+                            </div>
+                            <div class="progress-bar-container">
+                                <div class="progress-bar" id="progressBar" style="width: 0%"></div>
+                            </div>
+                            <div class="progress-meta">
+                                <span class="progress-percentage" id="progressPercentage">0%</span>
+                                <span class="progress-status" id="progressStatus">Uploading...</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Cleaning Configuration Panel -->
+                    <div class="cleaning-panel glass-card hidden" id="cleaningPanel">
+                        <div class="panel-header">
+                            <h3><i data-lucide="sliders"></i> Cleaning Configuration</h3>
+                            <p class="panel-desc">Select the operations you want to execute on your DataFrame</p>
+                        </div>
+                        
+                        <form id="cleaningOptionsForm">
+                            <div class="cleaning-options-grid">
+                                
+                                <!-- Group 1: General & Row Operations -->
+                                <div class="option-group">
+                                    <h4>Row Operations</h4>
+                                    <label class="option-checkbox">
+                                        <input type="checkbox" name="remove_duplicates" checked>
+                                        <span class="custom-chk"></span>
+                                        <span class="chk-label-box">
+                                            <span class="chk-title">Remove Duplicate Rows</span>
+                                            <span class="chk-desc">Drops rows with identical data across all columns</span>
+                                        </span>
+                                    </label>
+                                    <label class="option-checkbox">
+                                        <input type="checkbox" name="remove_empty_rows" checked>
+                                        <span class="custom-chk"></span>
+                                        <span class="chk-label-box">
+                                            <span class="chk-title">Remove Empty Rows</span>
+                                            <span class="chk-desc">Drops rows where every cell is null or empty</span>
+                                        </span>
+                                    </label>
+                                    <label class="option-checkbox">
+                                        <input type="checkbox" name="remove_null_values">
+                                        <span class="custom-chk"></span>
+                                        <span class="chk-label-box">
+                                            <span class="chk-title">Remove Null Values</span>
+                                            <span class="chk-desc">Aggressive: drops rows containing any null cell</span>
+                                        </span>
+                                    </label>
+                                </div>
+                                
+                                <!-- Group 2: Column & Names Operations -->
+                                <div class="option-group">
+                                    <h4>Column Operations</h4>
+                                    <label class="option-checkbox">
+                                        <input type="checkbox" name="remove_duplicate_cols" checked>
+                                        <span class="custom-chk"></span>
+                                        <span class="chk-label-box">
+                                            <span class="chk-title">Remove Duplicate Columns</span>
+                                            <span class="chk-desc">Removes columns with matching titles (keeps first)</span>
+                                        </span>
+                                    </label>
+                                    <label class="option-checkbox">
+                                        <input type="checkbox" name="remove_empty_cols" checked>
+                                        <span class="custom-chk"></span>
+                                        <span class="chk-label-box">
+                                            <span class="chk-title">Remove Empty Columns</span>
+                                            <span class="chk-desc">Removes columns where every single cell is null</span>
+                                        </span>
+                                    </label>
+                                    <label class="option-checkbox">
+                                        <input type="checkbox" name="lowercase_cols" checked>
+                                        <span class="custom-chk"></span>
+                                        <span class="chk-label-box">
+                                            <span class="chk-title">Convert Columns to Lowercase</span>
+                                            <span class="chk-desc">Replaces column header case to lowercase</span>
+                                        </span>
+                                    </label>
+                                    <label class="option-checkbox">
+                                        <input type="checkbox" name="underscore_cols" checked>
+                                        <span class="custom-chk"></span>
+                                        <span class="chk-label-box">
+                                            <span class="chk-title">Replace Spaces with Underscores</span>
+                                            <span class="chk-desc">Formats column headers: converts space to _</span>
+                                        </span>
+                                    </label>
+                                    <label class="option-checkbox">
+                                        <input type="checkbox" name="clean_col_names">
+                                        <span class="custom-chk"></span>
+                                        <span class="chk-label-box">
+                                            <span class="chk-title">Remove Column Special Characters</span>
+                                            <span class="chk-desc">Filters column names to only alphanumeric and _</span>
+                                        </span>
+                                    </label>
+                                </div>
+                                
+                                <!-- Group 3: Data Integrity & Typing -->
+                                <div class="option-group">
+                                    <h4>Data Integrity & Formatting</h4>
+                                    <label class="option-checkbox">
+                                        <input type="checkbox" name="trim_spaces" checked>
+                                        <span class="custom-chk"></span>
+                                        <span class="chk-label-box">
+                                            <span class="chk-title">Trim Extra Spaces</span>
+                                            <span class="chk-desc">Strips outer space and drops double inner space</span>
+                                        </span>
+                                    </label>
+                                    <label class="option-checkbox">
+                                        <input type="checkbox" name="fill_missing" checked>
+                                        <span class="custom-chk"></span>
+                                        <span class="chk-label-box">
+                                            <span class="chk-title">Fill Missing Values</span>
+                                            <span class="chk-desc">Fills NaNs: numeric with median, text with mode</span>
+                                        </span>
+                                    </label>
+                                    <label class="option-checkbox">
+                                        <input type="checkbox" name="detect_types" checked>
+                                        <span class="custom-chk"></span>
+                                        <span class="chk-label-box">
+                                            <span class="chk-title">Detect & Optimize Types</span>
+                                            <span class="chk-desc">Parses numeric strings and downcasts memory size</span>
+                                        </span>
+                                    </label>
+                                    <label class="option-checkbox">
+                                        <input type="checkbox" name="convert_dates" checked>
+                                        <span class="custom-chk"></span>
+                                        <span class="chk-label-box">
+                                            <span class="chk-title">Convert Date Columns</span>
+                                            <span class="chk-desc">Autodetects and formats dates to YYYY-MM-DD</span>
+                                        </span>
+                                    </label>
+                                    <label class="option-checkbox">
+                                        <input type="checkbox" name="handle_outliers">
+                                        <span class="custom-chk"></span>
+                                        <span class="chk-label-box">
+                                            <span class="chk-title">Handle Outliers</span>
+                                            <span class="chk-desc">Caps extreme values inside [Q1-1.5IQR, Q3+1.5IQR]</span>
+                                        </span>
+                                    </label>
+                                    <label class="option-checkbox">
+                                        <input type="checkbox" name="standardize_text">
+                                        <span class="custom-chk"></span>
+                                        <span class="chk-label-box">
+                                            <span class="chk-title">Standardize Text formatting</span>
+                                            <span class="chk-desc">Standardizes text columns to Title Case</span>
+                                        </span>
+                                    </label>
+                                    <label class="option-checkbox">
+                                        <input type="checkbox" name="remove_special_char">
+                                        <span class="custom-chk"></span>
+                                        <span class="chk-label-box">
+                                            <span class="chk-title">Remove Special Characters</span>
+                                            <span class="chk-desc">Removes symbols from text columns</span>
+                                        </span>
+                                    </label>
+                                </div>
+                                
+                            </div>
+                            
+                            <!-- Action button -->
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn-primary btn-lg" id="startCleaningBtn">
+                                    <span id="btnText"><i data-lucide="wand2"></i> Clean Dataset</span>
+                                    <span id="btnSpinner" class="hidden"><i data-lucide="loader-2" class="animate-spin"></i> Processing...</span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </section>
+                
+                <!-- SECTION 3: DATA PREVIEW & SUMMARY -->
+                <section id="previewSection" class="content-section">
+                    
+                    <!-- Cleaning Summary Cards -->
+                    <div class="summary-header">
+                        <h2><i data-lucide="clipboard-list"></i> Data Cleaning Summary</h2>
+                        <span class="success-badge"><i data-lucide="check-circle"></i> Clean Completed</span>
+                    </div>
+                    
+                    <div class="summary-stats-grid" id="summaryStatsGrid">
+                        <!-- Stats Cards will be injected dynamically -->
+                        <div class="stat-card glass-card">
+                            <span class="stat-label">Original Rows</span>
+                            <span class="stat-value" id="sumOrigRows">0</span>
+                        </div>
+                        <div class="stat-card glass-card">
+                            <span class="stat-label">Final Rows</span>
+                            <span class="stat-value" id="sumFinalRows">0</span>
+                        </div>
+                        <div class="stat-card glass-card">
+                            <span class="stat-label">Original Columns</span>
+                            <span class="stat-value" id="sumOrigCols">0</span>
+                        </div>
+                        <div class="stat-card glass-card">
+                            <span class="stat-label">Final Columns</span>
+                            <span class="stat-value" id="sumFinalCols">0</span>
+                        </div>
+                        <div class="stat-card glass-card warning">
+                            <span class="stat-label">Duplicates Removed</span>
+                            <span class="stat-value" id="sumDupRemoved">0</span>
+                        </div>
+                        <div class="stat-card glass-card warning">
+                            <span class="stat-label">Null Rows Removed</span>
+                            <span class="stat-value" id="sumNullRemoved">0</span>
+                        </div>
+                        <div class="stat-card glass-card info">
+                            <span class="stat-label">Missing Filled</span>
+                            <span class="stat-value" id="sumMissingFilled">0</span>
+                        </div>
+                        <div class="stat-card glass-card info">
+                            <span class="stat-label">Processing Time</span>
+                            <span class="stat-value" id="sumProcTime">0.0s</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Removed Rows Report Card -->
+                    <div class="removed-rows-card glass-card" id="removedRowsCard">
+                        <div class="removed-rows-header">
+                            <div class="removed-rows-title-group">
+                                <span class="removed-rows-emoji">🗑</span>
+                                <h3 class="removed-rows-title">Removed Rows</h3>
+                            </div>
+                            <button class="btn btn-sm btn-secondary copy-list-btn" id="copyRemovedRowsBtn" title="Copy row numbers to clipboard">
+                                <i data-lucide="clipboard-copy"></i> Copy List
+                            </button>
+                        </div>
+
+                        <!-- Summary badge -->
+                        <div class="removed-rows-meta">
+                            <span class="removed-total-badge" id="removedTotalBadge">
+                                <i data-lucide="hash"></i>
+                                Total Removed: <strong id="removedTotalCount">0</strong>
+                            </span>
+                        </div>
+
+                        <!-- Empty state -->
+                        <div class="removed-rows-empty hidden" id="removedRowsEmpty">
+                            <i data-lucide="check-circle-2" class="removed-empty-icon"></i>
+                            <p>No rows removed — your dataset was already clean in this dimension!</p>
+                        </div>
+
+                        <!-- Row numbers list -->
+                        <div class="removed-rows-body hidden" id="removedRowsBody">
+                            <div class="removed-rows-section">
+                                <span class="removed-section-label"><i data-lucide="list-ordered"></i> Row Numbers</span>
+                                <div class="removed-rows-list" id="removedRowsList">
+                                    <!-- Populated dynamically -->
+                                </div>
+                            </div>
+
+                            <!-- IDs section (shown only when id column exists) -->
+                            <div class="removed-rows-section hidden" id="removedIdsSection">
+                                <span class="removed-section-label"><i data-lucide="fingerprint"></i> IDs</span>
+                                <div class="removed-rows-list" id="removedIdsList">
+                                    <!-- Populated dynamically -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Data Preview Table -->
+                    <div class="preview-table-card glass-card">
+                        <div class="table-toolbar">
+                            <div class="toolbar-search">
+                                <i data-lucide="search"></i>
+                                <input type="text" id="tableSearchInput" placeholder="Search preview records...">
+                            </div>
+                            <div class="toolbar-info">
+                                <span class="record-count" id="recordCountText">Showing 0 of 0 records</span>
+                            </div>
+                        </div>
+                        
+                        <div class="table-container">
+                            <table class="data-table" id="previewDataTable">
+                                <thead id="previewTableHead">
+                                    <!-- Table headers injected dynamically -->
+                                    <tr><th>No columns loaded</th></tr>
+                                </thead>
+                                <tbody id="previewTableBody">
+                                    <!-- Table data injected dynamically -->
+                                    <tr><td class="empty-table">No data to display. Please upload and clean a file.</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <!-- Table Pagination -->
+                        <div class="table-pagination">
+                            <button class="btn btn-sm btn-secondary pagination-btn" id="prevPageBtn" disabled>
+                                <i data-lucide="chevron-left"></i> Previous
+                            </button>
+                            <div class="pagination-pages" id="paginationPagesInfo">
+                                Page <span id="currentPageNum">1</span> of <span id="totalPagesNum">1</span>
+                            </div>
+                            <button class="btn btn-sm btn-secondary pagination-btn" id="nextPageBtn" disabled>
+                                Next <i data-lucide="chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="nav-next-step">
+                        <button class="btn btn-primary btn-lg" id="proceedToExportBtn">
+                            Proceed to Export <i data-lucide="arrow-right"></i>
+                        </button>
+                    </div>
+                </section>
+                
+                <!-- SECTION 4: DOWNLOAD & SAVE -->
+                <section id="downloadSection" class="content-section">
+                    <div class="success-card glass-card">
+                        <div class="success-header">
+                            <div class="success-icon-wrapper">
+                                <i data-lucide="party-popper"></i>
+                            </div>
+                            <h2>Cleaning Completed Successfully!</h2>
+                            <p>Your clean dataset is compiled, validated, and ready to be downloaded or persisted in PostgreSQL.</p>
+                        </div>
+                        
+                        <div class="export-actions-grid">
+                            
+                            <!-- Action 1: Download CSV -->
+                            <div class="export-option-card glass-card">
+                                <i data-lucide="file-down" class="export-icon blue-glow"></i>
+                                <h3>Download Clean CSV</h3>
+                                <p>Save the fully cleaned dataset directly to your local computer as a standard CSV format.</p>
+                                <a href="#" class="btn btn-primary btn-block btn-lg disabled" id="downloadCleanedCsvBtn" style="pointer-events: none; opacity: 0.6;">
+                                    <i data-lucide="download"></i> Download Clean CSV
+                                </a>
+                            </div>
+                            
+                            <!-- Action 2: Save to PostgreSQL -->
+                            <div class="export-option-card glass-card">
+                                <i data-lucide="database-backup" class="export-icon green-glow"></i>
+                                <h3>Persist to PostgreSQL</h3>
+                                <p>Dynamically generate a schema matching your cleaned dataset and import it into a table.</p>
+                                
+                                <div class="db-save-form" id="dbSaveFormGroup">
+                                    <div class="form-group">
+                                        <label for="dbTableNameInput">Target Table Name</label>
+                                        <input type="text" id="dbTableNameInput" placeholder="e.g. cleaned_sales_data" class="form-control">
+                                    </div>
+                                    <button class="btn btn-success btn-block btn-lg" id="saveToPostgresBtn">
+                                        <span id="saveBtnText"><i data-lucide="database"></i> Save to Database</span>
+                                        <span id="saveBtnSpinner" class="hidden"><i data-lucide="loader-2" class="animate-spin"></i> Saving...</span>
+                                    </button>
+                                </div>
+                                <div class="db-disabled-msg hidden" id="dbDisabledMsg">
+                                    <i data-lucide="alert-circle"></i>
+                                    <p>Database save is disabled because PostgreSQL service is disconnected. Make sure PostgreSQL is running on port 5432 with password 1234.</p>
+                                </div>
+                            </div>
+                            
+                        </div>
+                        
+                        <div class="success-footer">
+                            <button class="btn btn-secondary" id="cleanAnotherFileBtn">
+                                <i data-lucide="plus"></i> Clean Another File
+                            </button>
+                        </div>
+                    </div>
+                </section>
+                
+            </main>
+            
+        </div>
+        
+    </div>
+    
+    <!-- Dynamic Toast Notification Container -->
+    <div class="toast-container" id="toastContainer"></div>
+    
+    <!-- Custom Application Javascript -->
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
