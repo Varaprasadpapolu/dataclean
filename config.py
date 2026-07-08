@@ -13,9 +13,16 @@ class Config:
     
     # File storage configuration
     BASE_DIR = os.path.abspath(os.path.dirname(__file__))
-    UPLOAD_FOLDER = os.path.join(BASE_DIR, 'uploads')
-    CLEANED_FOLDER = os.path.join(BASE_DIR, 'cleaned_files')
-    LOGS_FOLDER = os.path.join(BASE_DIR, 'logs')
+    
+    if os.environ.get('VERCEL') == '1':
+        # Vercel filesystem is read-only except for /tmp
+        UPLOAD_FOLDER = '/tmp/uploads'
+        CLEANED_FOLDER = '/tmp/cleaned_files'
+        LOGS_FOLDER = '/tmp/logs'
+    else:
+        UPLOAD_FOLDER = os.path.join(BASE_DIR, 'uploads')
+        CLEANED_FOLDER = os.path.join(BASE_DIR, 'cleaned_files')
+        LOGS_FOLDER = os.path.join(BASE_DIR, 'logs')
     
     # Create directories if they do not exist
     for folder in [UPLOAD_FOLDER, CLEANED_FOLDER, LOGS_FOLDER]:

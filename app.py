@@ -8,12 +8,12 @@ from config import Config
 from utils.helper import app_logger
 
 # Import API endpoints
-from api.upload import UploadAPI
-from api.clean import CleanAPI
-from api.preview import PreviewAPI
-from api.download import DownloadAPI
-from api.save_db import SaveDBAPI
-from api.status import StatusAPI
+from api_routes.upload import UploadAPI
+from api_routes.clean import CleanAPI
+from api_routes.preview import PreviewAPI
+from api_routes.download import DownloadAPI
+from api_routes.save_db import SaveDBAPI
+from api_routes.status import StatusAPI
 
 # Import Database setup
 from database.queries import setup_history_table

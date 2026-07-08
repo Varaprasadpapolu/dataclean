@@ -48,7 +48,7 @@ def run_tests():
     
     # 3. Clean
     print("\nCleaning DataFrame...")
-    df_cleaned, summary = clean_dataframe(df, options)
+    df_cleaned, summary, removed_rows = clean_dataframe(df, options)
     
     print("\nCleaned DataFrame:")
     print(df_cleaned)
